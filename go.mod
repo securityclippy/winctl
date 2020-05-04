@@ -1,6 +1,6 @@
 module github.com/securityclippy/winctl
 
-go 1.14
+go 1.13
 
 require (
 	github.com/mitchellh/go-homedir v1.1.0

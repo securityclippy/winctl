@@ -54,3 +54,57 @@ func FindByTitle(title string) (syscall.Handle, error) {
 	}
 	return hwnd, nil
 }
+
+
+func SetTitle(hwnd syscall.Handle, title string) uintptr {
+	s, _ := syscall.UTF16PtrFromString(title)
+	ret, _, _ := syscall.Syscall(proc.SetWindowTextA.Addr(), 1, uintptr(hwnd), uintptr(unsafe.Pointer(s)), 0)
+	return uintptr(ret)
+}
+
+const PROCESS_ALL_ACCESS = 0x1F0FFF
+
+func ptr(val interface{}) uintptr {
+	switch val.(type) {
+	case string:
+		return uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(val.(string))))
+	case int:
+		return uintptr(val.(int))
+	default:
+		return uintptr(0)
+	}
+}
+
+func OpenProcessHandle(processId int) syscall.Handle {
+	kernel32 := syscall.MustLoadDLL("kernel32.dll")
+	p := kernel32.MustFindProc("OpenProcess")
+	handle, _, _ := p.Call(ptr(PROCESS_ALL_ACCESS), ptr(true), ptr(processId))
+	return syscall.Handle(handle)
+}
+
+
+func GetHandle(cls string, win string) (ret syscall.Handle, err error) {
+
+	cls = "GxWindowClass"
+	// class will always be GxWindowClass for now
+	lpszClass, err := syscall.UTF16PtrFromString(cls)
+	if err != nil {
+		return
+	}
+	lpszWindow, err := syscall.UTF16PtrFromString(win)
+	if err != nil {
+		return
+	}
+
+
+	r0, _, e1 := syscall.Syscall(proc.FindWindowW.Addr(), 2, uintptr(unsafe.Pointer(lpszClass)), uintptr(unsafe.Pointer(lpszWindow)), 0)
+	//ret = HWND(r0)
+	if ret == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return syscall.Handle(r0), nil
+}
