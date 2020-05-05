@@ -2,10 +2,14 @@ package window
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/securityclippy/winctl/pkg/proc"
 	"syscall"
+	"time"
 	"unsafe"
 )
+
+var ErrRenameFailed = errors.New("rename window failed")
 
 func EnumWindows(enumFunc uintptr, lparam uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall(proc.EnumWindows.Addr(), 2, uintptr(enumFunc), uintptr(lparam), 0)
@@ -32,6 +36,8 @@ func GetText(hwnd syscall.Handle, str *uint16, maxCount int32) (len int32, err e
 	return
 }
 
+
+// Deprecated
 func FindByTitle(title string) (syscall.Handle, error) {
 	var hwnd syscall.Handle
 	cb := syscall.NewCallback(func(h syscall.Handle, p uintptr) uintptr {
@@ -55,11 +61,37 @@ func FindByTitle(title string) (syscall.Handle, error) {
 	return hwnd, nil
 }
 
+func StringToCharPtr(str string) *uint8 {
+	chars := append([]byte(str), 0) // null terminated
+	return &chars[0]
+}
 
-func SetTitle(hwnd syscall.Handle, title string) uintptr {
-	s, _ := syscall.UTF16PtrFromString(title)
+
+func setTitle(hwnd syscall.Handle, title string) uintptr {
+	s := StringToCharPtr(title)
 	ret, _, _ := syscall.Syscall(proc.SetWindowTextA.Addr(), 1, uintptr(hwnd), uintptr(unsafe.Pointer(s)), 0)
 	return uintptr(ret)
+}
+
+func Rename(src, dst string, debug bool) error {
+	hwnd, err := GetHandle("", src)
+
+	if err != nil {
+		return nil
+	}
+
+	if debug {
+		fmt.Printf("renaming %s --> %s with handle: %+v", src, dst, hwnd)
+	}
+	time.Sleep(time.Millisecond * 20)
+
+	ret := setTitle(hwnd, dst)
+
+	if ret == 0 {
+		return ErrRenameFailed
+	}
+
+	return nil
 }
 
 const PROCESS_ALL_ACCESS = 0x1F0FFF
