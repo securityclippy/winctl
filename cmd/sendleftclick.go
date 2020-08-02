@@ -15,19 +15,20 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/securityclippy/winctl/pkg/input"
 	"github.com/securityclippy/winctl/pkg/window"
+	"time"
 
 	"github.com/spf13/cobra"
 )
 
-var (
-	src string
-	dst string
-)
+var cls string
+var wName string
 
-// renameWindowCmd represents the renameWindow command
-var renameWindowCmd = &cobra.Command{
-	Use:   "rename-window",
+// sendleftclickCmd represents the sendleftclick command
+var sendleftclickCmd = &cobra.Command{
+	Use:   "sendleftclick",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -37,27 +38,39 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err := window.Rename(src, dst, false)
+		hwdn, err := window.GetHandle("", args[0])
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		log.Infoln("sending left click in 10 seconds to current mouse loc")
+
+
+		time.Sleep(time.Second * 10)
+		err = input.SendLeftClick(hwdn, true)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+
+		fmt.Println("sendleftclick called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(renameWindowCmd)
-	renameWindowCmd.Flags().StringVarP(&src, "src", "s", "", "source name")
-	renameWindowCmd.Flags().StringVarP(&dst, "dst", "d", "", "dest name")
-	renameWindowCmd.MarkFlagRequired("dst")
-	renameWindowCmd.MarkFlagRequired("src")
+	mouseCmd.AddCommand(sendleftclickCmd)
+	//sendleftclickCmd.Flags().StringVarP(&cls, "class", "c", "", "window class")
+	//sendleftclickCmd.MarkFlagRequired("class")
+	//sendleftclickCmd.Flags().StringVarP(&wName, "window", "w", "", "window name")
+	//sendleftclickCmd.MarkFlagRequired("window")
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// renameWindowCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// sendleftclickCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// renameWindowCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// sendleftclickCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -11,6 +11,10 @@ var (
 	SetWindowTextA = User32.MustFindProc("SetWindowTextA")
 	PostMessageA = User32.MustFindProc("PostMessageA")
 	FindWindowW = User32.MustFindProc("FindWindowW")
+
+	User32GetCursorPos = User32.MustFindProc("GetCursorPos")
+	User32ScreenToClient = User32.MustFindProc("ScreenToClient")
+	GetAsyncKeyState = User32.MustFindProc("GetAsyncKeyState")
 )
 
 

@@ -15,19 +15,14 @@
 package cmd
 
 import (
-	"github.com/securityclippy/winctl/pkg/window"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
-var (
-	src string
-	dst string
-)
-
-// renameWindowCmd represents the renameWindow command
-var renameWindowCmd = &cobra.Command{
-	Use:   "rename-window",
+// mouseCmd represents the mouse command
+var mouseCmd = &cobra.Command{
+	Use:   "mouse",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -36,28 +31,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		err := window.Rename(src, dst, false)
-		if err != nil {
-			log.Fatal(err)
-		}
+		fmt.Println("mouse called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(renameWindowCmd)
-	renameWindowCmd.Flags().StringVarP(&src, "src", "s", "", "source name")
-	renameWindowCmd.Flags().StringVarP(&dst, "dst", "d", "", "dest name")
-	renameWindowCmd.MarkFlagRequired("dst")
-	renameWindowCmd.MarkFlagRequired("src")
+	rootCmd.AddCommand(mouseCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// renameWindowCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// mouseCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// renameWindowCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// mouseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -112,13 +112,19 @@ func OpenProcessHandle(processId int) syscall.Handle {
 	p := kernel32.MustFindProc("OpenProcess")
 	handle, _, _ := p.Call(ptr(PROCESS_ALL_ACCESS), ptr(true), ptr(processId))
 	return syscall.Handle(handle)
+
+
+
 }
 
 
 func GetHandle(cls string, win string) (ret syscall.Handle, err error) {
 
-	cls = "GxWindowClass"
-	// class will always be GxWindowClass for now
+
+	//default to GxWindowClass for now
+	if cls == "" {
+		cls = "GxWindowClass"
+	}
 	lpszClass, err := syscall.UTF16PtrFromString(cls)
 	if err != nil {
 		return

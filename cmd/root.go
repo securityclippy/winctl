@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -24,6 +25,7 @@ import (
 )
 
 var cfgFile string
+var log *logrus.Logger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,6 +53,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	log = logrus.New()
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
